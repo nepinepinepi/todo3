@@ -1,6 +1,5 @@
 # TodoApp — Serverless CRUD on AWS
 
-![CI](https://github.com/your-org/todo-app/actions/workflows/ci.yml/badge.svg)
 ![License](https://img.shields.io/github/license/your-org/todo-app)
 
 > **完全オフラインでテスト可能**なサーバーレス TODO 管理アプリケーションです。バックエンドは AWS のマネージドサービス、フロントエンドは Vuetify SPA で構築しています。
@@ -15,12 +14,11 @@
 4. [前提条件](#前提条件)
 5. [ローカル開発 (オフライン)](#ローカル開発-オフライン)
 6. [自動テスト](#自動テスト)
-7. [CI/CD](#cicd)
-8. [デプロイ](#デプロイ)
-9. [ディレクトリ構成](#ディレクトリ構成)
-10. [環境変数](#環境変数)
-11. [ライセンス](#ライセンス)
-12. [参考](#参考)
+7. [デプロイ](#デプロイ)
+8. [ディレクトリ構成](#ディレクトリ構成)
+9. [環境変数](#環境変数)
+10. [ライセンス](#ライセンス)
+11. [参考](#参考)
 
 ---
 
@@ -30,17 +28,16 @@
 
 * スケーラブルで低コストな本番環境デプロイ
 * **クラウド通信なしで完結**するローカルテスト環境
-* GitHub Actions による自動ビルド & テスト
 
 ## アーキテクチャ
 
 ```
-┌─────────────┐       ┌──────────────────────────┐
-│  Browser    │       │      GitHub Actions       │
-│ (Vue SPA)   │       │   Build / Test / Deploy   │
-└─────┬───────┘       └──────────┬───────────────┘
-      │ CDN                       │ IaC (SAM)
-      ▼                           ▼
+┌─────────────┐
+│  Browser    │
+│ (Vue SPA)   │
+└─────┬───────┘
+      │ CDN
+      ▼
 ┌─────────────┐           ┌──────────────────────┐
 │ CloudFront  │◀─────────▶│   S3 (Static SPA)    │
 └─────┬───────┘           └──────────────────────┘
@@ -138,31 +135,6 @@ services:
 
 * 各ジョブは **クラウドへ通信しません**。LocalStack & DynamoDB Local が提供するエンドポイント (`http://localhost:4566`, `http://localhost:8000`) に対して実行します。
 * Lambda ハンドラは `sam build` で transpile → `sam local invoke` でユニット + 依存リソース分離テスト。
-
-## CI/CD
-
-> `.github/workflows/ci.yml` 参照
-
-```yaml
-actions:
-  test:
-    runs-on: ubuntu-latest
-    services:
-      localstack:
-        image: localstack/localstack:4.3
-        ports: ["4566:4566"]
-      dynamodb-local:
-        image: public.ecr.aws/aws-dynamodb-local/dynamodb-local:latest
-        ports: ["8000:8000"]
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-      - uses: aws-actions/setup-sam@v2
-      - run: make bootstrap
-      - run: make test
-```
 
 ## デプロイ
 
